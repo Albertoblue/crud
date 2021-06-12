@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <link rel="stylesheet" href="assets/fontawesome-free-5.15.3-web/css/all.css">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.0.2/dist/sweetalert2.min.css">  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+<body>
+  <div id="app">
+    <v-app>
+      <v-main>      
+        <v-card class="mx-auto mt-5" max-width="1200">
+
+
+          
+          
+          <!-- Campo de texto para la busqueda dinamica -->
+          
+          <v-text-field placeholder="Buscar" v-model="searchQuery" v-on:keyup="search"></v-text-field>
+         
+          <!--<v-btn rounded color="primary" @click="search">Buscar</v-btn>-->
+          
+          <!--Se define el boton agregar-->
+
+            <v-btn rounded color="green accent-2" @click="formNuevo()">Agregar</i></v-btn> 
+
+            
+    
+          <br>
+          <!--Se definen dos botones para exportar las tablas a CSV-->
+          <center>
+            
+            <v-btn  rounded color="secondary" @click="exportar(1)">Exportar todo en Csv</v-btn>
+            <v-btn  rounded color="secondary" @click="exportar(2)">Exportar solo esta tabla en Csv</v-btn>
+          </center>
+        
+       <!--Se define el titulo de la tabla y una etiqueta span donde se visualiza la cantidad total de elementos en la tabla-->   
+        <h2 class="text-center mt-5">Llamadas</h2>
+        <div class="col text-right">
+          <h5>Total:<span class="badge bg-primary">{{total}}</span></h5>
+      </div>
+
+<!--div que aparece solo cuando hay una busqueda, especifica el nùmero de coincidencias-->
+        <div class="col text-right" v-if="criterio>0">
+          <h5>Total encontrados con el criterio de busqueda:<span class="badge bg-primary">{{criterio}}</span></h5>
+      </div>
+
+          <!-- Tabla y formulario -->
+        <v-simple-table id="tabla" class="mt-5">
+            <template v-slot:default>
+                <thead>
+                    <tr class="light-blue darken-2">
+                        <th class="white--text">ID</th>
+                        <th class="white--text">ORIGEN</th>
+                        <th class="white--text">DESTINO</th>
+                        <th class="white--text">INICIO</th>
+                        <th class="white--text">FIN</th>
+                        <th class="white--text text-center">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="articulo in datosPaginados" :key="articulo.id">
+                    <td>{{ articulo.id }}</td>
+                    <td>{{ articulo.origen }}</td>
+                    <td>{{ articulo.destino }}</td>
+                    <td>{{ articulo.inicio }}</td>
+                    <td>{{ articulo.fin }}</td>
+                    <td>
+                        <v-btn class="teal accent-4" dark @click="formEditar(articulo.id, articulo.origen, articulo.destino, articulo.inicio,articulo.fin)">Editar</v-btn>
+                        <v-btn class="error" dark @click="borrar(articulo.id)">Borrar</v-btn>
+                    </td>
+                    </tr>
+                </tbody>
+            </template>
+        </v-simple-table>
+        </v-card>        
+
+      <!-- Componente de Diálogo para CREAR y EDITAR -->
+      <v-dialog v-model="dialog" max-width="500">        
+        <v-card>
+          <v-card-title class="blue-grey darken-1 white--text">Llamada</v-card-title>    
+          <v-card-text>            
+            <v-form>             
+              <v-container>
+                <v-row>
+                  <input v-model="articulo.id" hidden></input>
+                  <v-col cols="12" md="4">
+                    <v-text-field v-model="articulo.id" label="id" id >{{articulo.id}}</v-text-field>
+                   
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-text-field v-model="articulo.origen" label="origen" origen>{{articulo.id}}</v-text-field>
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-text-field v-model="articulo.destino" label="destino" destino></v-text-field>
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-text-field v-model="articulo.inicio" label="inicio" type="time" inicio></v-text-field>
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-text-field v-model="articulo.fin" label="fin" type="time" fin></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-container>            
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn @click="dialog=false">Cancelar</v-btn>
+            <v-btn @click="guardar()" type="submit" color="indigo" dark>Guardar</v-btn>
+          </v-card-actions>
+          </v-form>
+        </v-card>
+      </v-dialog>
+      
+
+      </v-main>
+
+      <br>
+      <!--Paginacion -->
+      <nav aria-label="...">
+        <ul class="pagination justify-content-center">
+          <li class="page-item active" v-bind:class="isActive()">
+            <a class="page-link" v-on:click="getPreviousPage()" tabindex="-1" >Anterior</a>
+          </li>
+          <li>
+            <!--<li v-for="pagina in totalPaginas()" v-on:click="getDataPagina(pagina)" class="page-item"><a class="page-link" >{{pagina}}</a></li>-->
+            <a class="page-link" v-on:click="getNextPage()" v-bind:class="isDesactive()">Siguiente</a>
+          </li>
+
+        </ul>
+      </nav>
+    </v-app>
+  </div>
+
+  <!--Librerias de Java Script-->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js" integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg==" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.0.2/dist/sweetalert2.all.min.js"></script>
+  <script src="papaparse.min.js"></script>
+  
+  <!--Comienza el script de vue.js -->
+  <script>
+  var url = "http://127.0.0.1:8000/backend/crud.php";
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+       data () {
+        return {            
+            articulos: [],
+            datosPaginados:[],
+            dialog: false,
+            operacion: '',
+            searchQuery:'',
+            elementosPorPagina:15,
+            paginaActual:1,
+            total:0,
+            criterio:0,
+            
+            articulo:{
+                id: null,
+                origen:'',
+                destino:'',
+                inicio:'',
+                fin:'',
+            }          
+        }
+       },
+       created(){       
+            this.mostrar()
+       },
+       
+       methods:{ 
+
+        isDesactive(){//Metodo que desactiva la paginacion siguiente si ya no hay màs usuarios que mostrar 
+          if(this.paginaActual==this.totalPaginas()){
+               return "disabled";
+          }
+        },
+
+        isActive(){//Metodo que desactiva la paginacion anterior cuando es la tabla que contiene a los primeros usuarios
+
+          if(this.paginaActual==1){
+            return "disabled";
+          }
+
+          
+        },
+
+           totalPaginas(){//Calculo para saber la cantidad de paginas dependiendo de la cantidad de usuarios y los usuarios mostrados por pagina
+             return Math.ceil(this.articulos.length/this.elementosPorPagina);
+
+           },
+           getDataPagina(noPagina){//se traen los datos de los usuarios a paginar y se guardan en el arreglo datos paginados
+
+            this.paginaActual=noPagina;
+
+            this.datosPaginados=[];
+
+            let ini=(noPagina*this.elementosPorPagina)-this.elementosPorPagina;
+            let fin=(noPagina*this.elementosPorPagina);
+            this.datosPaginados=this.articulos.slice(ini,fin);
+            console.log(this.articulos);
+
+           },
+
+           getPreviousPage(){//Nos trae a los usuarios anteriores de la pagina en la que nos encontramos
+             if(this.paginaActual>1){
+               this.paginaActual--;
+             }
+             this.getDataPagina(this.paginaActual);
+
+           },
+           getNextPage(){//nos trae a los siguientes usuarios dependiendo en la pagina que nos encontremos
+             if(this.paginaActual<this.totalPaginas()){
+               this.paginaActual++;
+             }
+             this.getDataPagina(this.paginaActual);
+
+           },
+         
+            search:function(){//realiza la busqueda en tiempo real gracias a vue.js
+              console.log("Hola");
+              //this.getDataPagina(this.paginaActual);
+              this.datosPaginados=this.articulos;
+              /*this.datosPaginados=this.datosPaginados.filter(articulo=>articulo.origen==this.searchQuery||articulo.id==this.searchQuery||articulo.destino==this.searchQuery||articulo.inicio==this.searchQuery||articulo.fin==this.searchQuery);
+              if(this.searchQuery==""){
+
+                this.getDataPagina(this.paginaActual);
+              }*/
+
+              this.datosPaginados=this.datosPaginados.filter(articulo=>articulo.origen==this.searchQuery||articulo.id==this.searchQuery||articulo.destino==this.searchQuery||articulo.inicio==this.searchQuery||articulo.fin==this.searchQuery);
+              
+              this.criterio=this.datosPaginados.length
+              if(this.searchQuery==""){
+
+                this.getDataPagina(this.paginaActual);
+                
+              }
+               
+            },
+            //MÉTODOS PARA EL CRUD
+            mostrar:function(){
+              axios.post(url,{opcion:1})
+              .then(response =>{
+                this.articulos = response.data;
+                this.getDataPagina(1);
+                this.total=this.articulos.length;                  
+              })
+            },
+
+            exportar:function(valor){//metodo intermedio para exportar csv
+
+              if(valor==1){
+
+                this.csvExport(this.articulos);
+
+              }else{
+
+                this.csvExport(this.datosPaginados);
+              }
+
+
+
+            },
+            crear:function(){                
+                axios.post(url, {opcion:2, id:this.articulo.id, origen:this.articulo.origen, destino:this.articulo.destino,inicio:this.articulo.inicio,fin:this.articulo.fin })
+                .then(response =>{
+                  this.mostrar();
+                  this.total=this.articulos.length;
+                });   
+                this.articulo.id="";
+                this.articulo.origen="";
+                this.articulo.destino="";
+                this.articulo.inicio="";
+                this.articulo.fin="";
+            },  
+            editar:function(id, descripcion, precio, stock){
+              axios.post(url, {opcion:3, id:this.articulo.id, origen:this.articulo.origen, destino:this.articulo.destino, inicio:this.articulo.inicio,fin:this.articulo.fin})
+                  .then(response =>{
+                    this.mostrar();
+                    
+              }); 
+            },             
+            borrar:function(id){
+             Swal.fire({
+                title: '¿Confirma eliminar el registro?',   
+                confirmButtonText: `Confirmar`,                  
+                showCancelButton: true,                          
+              }).then((result) => {                
+                if (result.isConfirmed) {      
+                      axios.post(url, {opcion:4, id:id}).then(response =>{           
+                          this.mostrar();
+                       });      
+                  Swal.fire('¡Eliminado!', '', 'success')
+                  this.total=this.articulos.length;
+                } else if (result.isDenied) {                  
+                }
+              });              
+            },
+
+            //Botones y formularios
+            guardar:function(){
+              if(this.operacion=='crear'){
+                console.log(this.articulos);                
+                this.crear();
+              }
+              if(this.operacion=='editar'){ 
+                this.editar();                           
+              }
+              this.dialog=false;                        
+            }, 
+            formNuevo:function () {              
+              this.dialog=true;
+              this.operacion='crear';
+              this.articulo.id='';
+              this.articulo.origen='';                           
+              this.articulo.destino='';
+              this.articulo.inicio='';
+              this.articulo.fin='';
+              console.log(this.articulos); 
+            },
+            formEditar:function(id, origen,destino,inicio,fin){                              
+              //capturamos los datos del registro seleccionado y los mostramos en el formulario
+              this.articulo.id = id;
+              this.articulo.origen = origen;                            
+              this.articulo.destino = destino;
+              this.articulo.inicio = inicio;
+              this.articulo.fin = fin;                       
+              this.dialog=true;                            
+              this.operacion='editar';
+            },
+
+            //Funcion que guarda en un csv
+            csvExport(arrData) {
+              let csvContent = "data:text/csv;charset=utf-8,";
+              csvContent += [
+              Object.keys(arrData[0]).join(";"),
+              ...arrData.map(item => Object.values(item).join(";"))
+              ]
+              .join("\n")
+              .replace(/(^\[)|(\]$)/gm, "");
+
+              const data = encodeURI(csvContent);
+              const link = document.createElement("a");
+              link.setAttribute("href", data);
+              link.setAttribute("download", "export.csv");
+              link.click();
+    },
+  
+       }      
+    });
+  </script>
+</body>
+</html> 
