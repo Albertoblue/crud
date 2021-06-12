@@ -1,105 +1,73 @@
-# Título del Proyecto
+# Crud con vue.js, vuetify, sweetAlert2 y Bootstrap 5 con conexión con php y mysql
 
-_Acá va un párrafo que describa lo que es el proyecto_
+En este proyecto se crea un crud del lado del cliente usando el framework vue.js y herramientas para estilizar y hacer más rapido el desarrollo
+como lo es vuetify, sweetAlert2 y Botstrap5. El proyecto desarrolla paginación y busqueda de registros en tiempo real. Del lado del servidor se utiliza php 
+para atender las peticiones http y conectarse a la base de datos con el fin de hacer persistente la información.
 
 ## Comenzando 🚀
 
-_Estas instrucciones te permitirán obtener una copia del proyecto en funcionamiento en tu máquina local para propósitos de desarrollo y pruebas._
-
-Mira **Deployment** para conocer como desplegar el proyecto.
+_Estas instrucciones te permitirán obtener una copia de este proyecto funcionando en tu máquina local con los propósitos de desarrollo y pruebas._
 
 
 ### Pre-requisitos 📋
 
-_Que cosas necesitas para instalar el software y como instalarlas_
+_Para correr el programa deberas tener instalado php en su versión 7 o superior y contar con un servidor como apache o nginx_ (php puede levantar un servidor y escuchar peticiones). Si solo deseas instalar php puedes levantar el servidor que tiene incluido con el siguiente comando.
 
 ```
-Da un ejemplo
+php -S localhost:800
 ```
 
 ### Instalación 🔧
 
-_Una serie de ejemplos paso a paso que te dice lo que debes ejecutar para tener un entorno de desarrollo ejecutandose_
+_En este proyecto migré el archivo csv incluido a mi base de datos_
 
-_Dí cómo será ese paso_
+_Entra a tu base de datos de la siguiente forma_
+```
+mysql -u nombre_usuario -p
+```
+_Debes sustituir nombre_usuario por tu correspondiente usuario, inmediatamente después te pedirá la contraseña de acceso._
+_Tendrás que crear una nueva base de datos y una nueva tabla aquí te dejo un ejemplo_
+
 
 ```
-Da un ejemplo
+create database NombreBd;
+```
+```
+use NombreBd;
+```
+_Nuevamente sustituyes NombreBd por el nombre de la base de datos que te agrade, en mi caso le llamé "llamadas"._
+
+
+_Nuevamente sustituyes NombreBd por el nombre de la base de datos que te agrade, en mi caso le llamé "llamadas"_
+_Ahora creas una nueva tabla, en mi caso también le llamé llamadas, te dejo el comando utilizado_
+```
+create table llamadas(id varchar(50) not null,origen bigint,destino bigint,inicio time,fin time,primary key(id));
 ```
 
-_Y repite_
+_Ahora debes de exportas el archivo CSV para llenar con filas la tabla, el comando es el siguiente_
 
 ```
-hasta finalizar
+load data local infile 'ruta_del_archivo' into table nombreTabla fields terminated by ',' lines terminated by '\r\n';
 ```
+_Debes sustituir nombreRabla por el nombre de tu tabla mientras que la ruta_del_archivo indica donde se encuentra tu CSV_ 
 
-_Finaliza con un ejemplo de cómo obtener datos del sistema o como usarlos para una pequeña demo_
+_Cuando todo esté listo en la bases de datos, debes de colocar todo el proyecto en la carpeta www si tienes apache o nginx, si no es así coloca tu terminal en el proyecto (con el comando cd) y ejecuta el servidor php con el comando previamente presentado._
 
-## Ejecutando las pruebas ⚙️
-
-_Explica como ejecutar las pruebas automatizadas para este sistema_
-
-### Analice las pruebas end-to-end 🔩
-
-_Explica que verifican estas pruebas y por qué_
-
-```
-Da un ejemplo
-```
-
-### Y las pruebas de estilo de codificación ⌨️
-
-_Explica que verifican estas pruebas y por qué_
-
-```
-Da un ejemplo
-```
 
 ## Despliegue 📦
 
-_Agrega notas adicionales sobre como hacer deploy_
+* El proyecto desplegado -(https://mvirtuami/crud/index.html) - 
 
 ## Construido con 🛠️
 
 _Menciona las herramientas que utilizaste para crear tu proyecto_
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - El framework web usado
-* [Maven](https://maven.apache.org/) - Manejador de dependencias
-* [ROME](https://rometools.github.io/rome/) - Usado para generar RSS
+* [vue](https://vuejs.org/v2/guide/) - El framework web usado
+* [Vuetify](https://vuetifyjs.com/en/introduction/why-vuetify/#guide) - Manejo de estilos en los componentes de Vue.js
+* [SweetAlert2](https://sweetalert2.github.io/#examples) - Usado para generar animaciones en los cuadro de dialogo
 
-## Contribuyendo 🖇️
-
-Por favor lee el [CONTRIBUTING.md](https://gist.github.com/villanuevand/xxxxxx) para detalles de nuestro código de conducta, y el proceso para enviarnos pull requests.
-
-## Wiki 📖
-
-Puedes encontrar mucho más de cómo utilizar este proyecto en nuestra [Wiki](https://github.com/tu/proyecto/wiki)
-
-## Versionado 📌
-
-Usamos [SemVer](http://semver.org/) para el versionado. Para todas las versiones disponibles, mira los [tags en este repositorio](https://github.com/tu/proyecto/tags).
-
-## Autores ✒️
-
-_Menciona a todos aquellos que ayudaron a levantar el proyecto desde sus inicios_
-
-* **Andrés Villanueva** - *Trabajo Inicial* - [villanuevand](https://github.com/villanuevand)
-* **Fulanito Detal** - *Documentación* - [fulanitodetal](#fulanito-de-tal)
-
-También puedes mirar la lista de todos los [contribuyentes](https://github.com/your/project/contributors) quíenes han participado en este proyecto. 
-
-## Licencia 📄
-
-Este proyecto está bajo la Licencia (Tu Licencia) - mira el archivo [LICENSE.md](LICENSE.md) para detalles
-
-## Expresiones de Gratitud 🎁
-
-* Comenta a otros sobre este proyecto 📢
-* Invita una cerveza 🍺 o un café ☕ a alguien del equipo. 
-* Da las gracias públicamente 🤓.
-* etc.
 
 
 
 ---
-⌨️ con ❤️ por [Villanuevand](https://github.com/Villanuevand) 😊
+⌨️ con ❤️ por [Juan Alberto Alcantara Sotelo](https://github.com/Albertoblue) 😊
