@@ -56,7 +56,7 @@ _Cuando todo esté listo en la bases de datos, debes de colocar todo el proyecto
 
 ## Despliegue 📦
 
-* El proyecto desplegado -(https://mvirtuami.izt.uam.mx/crud/) - 
+* El proyecto desplegado -(http://148.206.58.26/) - 
 
 ## Construido con 🛠️
 
