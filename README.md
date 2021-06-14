@@ -60,7 +60,7 @@ _Cuando todo esté listo en la bases de datos, debes de colocar todo el proyecto
 
 ## Construido con 🛠️
 
-_Menciona las herramientas que utilizaste para crear tu proyecto_
+_Las herramientas que se utilizaron para crear el proyecto proyecto se describen a continuación_
 
 * [vue](https://vuejs.org/v2/guide/) - El framework web usado
 * [Vuetify](https://vuetifyjs.com/en/introduction/why-vuetify/#guide) - Manejo de estilos en los componentes de Vue.js
